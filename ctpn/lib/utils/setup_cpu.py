@@ -121,7 +121,8 @@ ext_modules = [
 ext_modules = [
     Extension(
         "utils.bbox", ["bbox.pyx"],
-        extra_compile_args={'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
+        # extra_compile_args={'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
+        extra_compile_args=nvcc_compile_args,
         include_dirs=[numpy_include]),
     Extension(
         "utils.cython_nms", ["cython_nms.pyx"],

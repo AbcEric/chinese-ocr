@@ -234,9 +234,9 @@ __C.EPS = 1e-14
 __C.ROOT_DIR = osp.abspath(osp.join(osp.dirname(__file__), '..', '..'))
 
 # Data directory
-# __C.DATA_DIR = osp.abspath(osp.join(__C.ROOT_DIR, 'data'))
+__C.DATA_DIR = osp.abspath(osp.join(__C.ROOT_DIR, 'data'))
 # 将voc的文件位置移到仓库外部
-__C.DATA_DIR = '/Users/xiaofeng/Code/Github/dataset/CHINESE_OCR/ctpn/'
+# __C.DATA_DIR = '/Users/xiaofeng/Code/Github/dataset/CHINESE_OCR/ctpn/'
 
 # Model directory
 __C.MODELS_DIR = osp.abspath(osp.join(__C.ROOT_DIR, 'models', 'pascal_voc'))
@@ -249,7 +249,8 @@ __C.EXP_DIR = 'default'
 __C.LOG_DIR = 'default'
 
 # Use GPU implementation of non-maximum suppression
-__C.USE_GPU_NMS = True
+# __C.USE_GPU_NMS = True
+__C.USE_GPU_NMS = False
 
 # Default GPU device id
 __C.GPU_ID = 0
