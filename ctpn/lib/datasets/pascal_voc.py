@@ -32,6 +32,7 @@ class pascal_voc(imdb):
         # 生成数据集的根目录
         self._devkit_path = self._get_default_path() if devkit_path is None \
                             else devkit_path
+
         # 将数据文件保存在仓库之外的位置
         self._devkit_path = '/Users/xiaofeng/Code/Github/dataset/CHINESE_OCR/ctpn/VOCdevkit2007'
         # 得到数据集的目录

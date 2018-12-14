@@ -1,3 +1,13 @@
+#
+# 更换机器后需要重新在BASH下执行make-for-cpu.sh（Windows下为mysetup.py）
+# 将build下生成的pyd文件拷贝到utils目录下
+# 运行主目录为：[CHINESE-OCR\ctpn]
+#
+# Q:
+# 1. 目前对文字的定位很准确，缺点是运行较慢，每张图片至少2秒以上，考虑用Faster RCNN替换：0.2s
+# 2. 如何得到文字的位置？参见save_results()
+#
+
 import glob
 import os
 import shutil
@@ -27,7 +37,7 @@ def connect_proposal(text_proposals, scores, im_size):
 
 
 def save_results(image_name, im, line, thresh):
-    inds = np.where(line[:, -1] >= thresh)[0]
+    inds = np.where(line[:, -1] >= thresh)[0]       # 找到line中符合条件（每列最后一个元素值大于thresh）的行，返回为tuple，[0]取元素为ndarray
     if len(inds) == 0:
         return
 
@@ -77,6 +87,7 @@ def ctpn(sess, net, image_name):
     keep = np.where(dets[:, 4] >= 0.7)[0]
     dets = dets[keep, :]
     line = connect_proposal(dets[:, 0:4], dets[:, 4], im.shape)
+    print(type(line), len(line), line)
     save_results(image_name, im, line, thresh=0.9)
 
 
@@ -85,21 +96,18 @@ if __name__ == '__main__':
         shutil.rmtree("../data/results/")
     os.makedirs("../data/results/")
 
-    cfg.TEST.HAS_RPN = True  # Use RPN for proposals
+    cfg.TEST.HAS_RPN = True     # Use RPN for proposals
     # init session
     config = tf.ConfigProto(allow_soft_placement=True)
     sess = tf.Session(config=config)
+
     # load network
     net = get_network("VGGnet_test")
-    # load model
-    print('Loading network {:s}... '.format("VGGnet_test")),
+    print('Loading network {:s}... '.format("VGGnet_test"))
     saver = tf.train.Saver()
     saver.restore(sess,
                   os.path.join(os.getcwd(), "../checkpoints/VGGnet_fast_rcnn_iter_50000.ckpt"))
-    # saver.restore(sess,
-    #               os.path.join(os.getcwd(),
-    #                            "/Users/xiaofeng/Code/Github/dataset/CHINESE_OCR/ctpn/checkpoints/VGGnet_fast_rcnn_iter_50000.ckpt"))
-    print(' done.')
+    print('load done.')
 
     # Warmup on a dummy image
     im = 128 * np.ones((300, 300, 3), dtype=np.uint8)
