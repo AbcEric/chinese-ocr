@@ -23,29 +23,35 @@ load network
 
 
 def load_tf_model():
-    cfg.TEST.HAS_RPN = True  # Use RPN for proposals
+    cfg.TEST.HAS_RPN = True         # Use RPN for proposals
     # init session
     config = tf.ConfigProto(allow_soft_placement=True)
+
     net = get_network("VGGnet_test")
+
     # load model
     saver = tf.train.Saver()
     # sess = tf.Session(config=config)
+
     sess = tf.Session()
     ckpt = tf.train.get_checkpoint_state(
-        '/Users/xiaofeng/Code/Github/dataset/CHINESE_OCR/ctpn/ctpn_checkpoints/')
+        # './checkpoints/')
+        '/MyProjects/ModelSet/Chinese-OCR/ctpn/checkpoints/')
+    # print("load ckpt=[", ckpt, "]")
+
     reader = tf.train.NewCheckpointReader(ckpt.model_checkpoint_path)
     var_to_shape_map = reader.get_variable_to_shape_map()
-    for key in var_to_shape_map:
-        print("Tensor_name is : ", key)
+    # for key in var_to_shape_map:
+    #     print("Tensor_name is : ", key)
         # print(reader.get_tensor(key))
     saver.restore(sess, ckpt.model_checkpoint_path)
-    print("load vggnet done")
+    # print("load vggnet done")
     return sess, saver, net
 
 
 # init model
 sess, saver, net = load_tf_model()
-
+print("ctpn load ok!")
 
 # 进行文本识别
 def ctpn(img):

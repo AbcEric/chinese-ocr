@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ## 修复K.ctc_decode bug 当大量测试时将GPU显存消耗完，导致错误，用decode 替代
 ###
-import os,sys
+import os, sys
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parentdir)
 # from PIL import Image
@@ -14,8 +14,6 @@ from keras.layers import Input, Conv2D, MaxPooling2D, ZeroPadding2D
 from keras.layers import Lambda
 from keras.models import Model
 from keras.optimizers import SGD
-
-
 # from keras.models import load_model
 
 
@@ -71,10 +69,15 @@ def get_model(height, nclass):
 
 
 characters = keys_ocr.alphabet[:]
-modelPath = os.path.join(os.getcwd(), "ocr/ocr0.2.h5")
+# modelPath = os.path.join(os.getcwd(), "ocr/ocr0.2.h5")
+
+# CRNN模型预训练权重：
+modelPath = os.path.join(os.getcwd(), "../ModelSet/Chinese-OCR/my_model_keras.h5")
 # modelPath = '/Users/xiaofeng/Code/Github/dataset/CHINESE_OCR/save_model/my_model_keras.h5'
 height = 32
-nclass=len(characters)+1
+nclass = len(characters)+1
+
+print(modelPath)
 if os.path.exists(modelPath):
     model, basemodel = get_model(height, nclass)
     basemodel.load_weights(modelPath)

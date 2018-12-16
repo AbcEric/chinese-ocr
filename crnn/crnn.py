@@ -12,6 +12,7 @@ import models.crnn as crnn
 import keys_crnn
 from math import *
 import cv2
+import os
 
 GPU = False
 
@@ -41,7 +42,8 @@ def crnnSource():
         model = crnn.CRNN(32, 1, len(alphabet) + 1, 256, 1).cuda()
     else:
         model = crnn.CRNN(32, 1, len(alphabet) + 1, 256, 1).cpu()
-    path = './crnn/samples/model_acc97.pth'
+    print(os.getcwd())
+    path = '/MyProjects/ModelSet/Chinese-OCR/crnn/samples/model_acc97.pth'         # PyTorch?
     model.eval()
     model.load_state_dict(torch.load(path))
     return model, converter
@@ -49,7 +51,7 @@ def crnnSource():
 
 ##加载模型
 model, converter = crnnSource()
-
+print("crnn load ok!")
 
 def crnnOcr(image):
     """

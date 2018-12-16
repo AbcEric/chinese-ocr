@@ -15,7 +15,7 @@ from keras.layers import Dense
 from keras.models import Model
 # 编译模型，以较小的学习参数进行训练
 from keras.optimizers import SGD
-
+import os
 
 def load():
     vgg = VGG16(weights=None, input_shape=(224, 224, 3))
@@ -28,8 +28,11 @@ def load():
     sgd = SGD(lr=0.00001, momentum=0.9)
     model.compile(
         optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
+
+    # 需下载：文本方向检测模型VGG分类
+    print(os.getcwd())
     model.load_weights(
-        '/Users/xiaofeng/Code/Github/dataset/CHINESE_OCR/angle/modelAngle.h5')
+        '../ModelSet/Chinese-OCR/modelAngle.h5')
     return model
 
 

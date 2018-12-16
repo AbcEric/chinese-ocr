@@ -1,17 +1,15 @@
 # coding:utf-8
 ##添加文本方向 检测模型，自动检测文字方向，0、90、180、270
 from math import *
-
 import cv2
 import numpy as np
 from PIL import Image
 import sys
+import time
 
 sys.path.append("ocr")
-from angle.predict import predict as angle_detect  ##文字方向检测
-
+from angle.predict import predict as angle_detect       # 文字方向检测
 from crnn.crnn import crnnOcr
-
 from ctpn.text_detect import text_detect
 from ocr.model import predict as ocr
 
@@ -52,10 +50,11 @@ def crnnRec(im, text_recs, ocrMode='keras', adjust=False):
         partImg = dumpRotateImage(im, degree, pt1, pt2, pt3, pt4)
         # 根据ctpn进行识别出的文字区域，进行不同文字区域的crnn识别
         image = Image.fromarray(partImg).convert('L')
+
         # 进行识别出的文字识别
-        if ocrMode == 'keras':
+        if ocrMode == 'keras':      # Keras
             sim_pred = ocr(image)
-        else:
+        else:                       # PyTorch？
             sim_pred = crnnOcr(image)
 
         results[index].append(sim_pred)  ##识别文字
@@ -97,6 +96,8 @@ def model(img, model='keras', adjust=False, detectAngle=False):
     
     """
     angle = 0
+    t = time.time()
+
     if detectAngle:
         # 进行文字旋转方向检测，分为[0, 90, 180, 270]四种情况
         angle = angle_detect(img=np.copy(img))  ##文字朝向检测
@@ -110,12 +111,21 @@ def model(img, model='keras', adjust=False, detectAngle=False):
         elif angle == 270:
             im = im.transpose(Image.ROTATE_270)
         img = np.array(im)
-    # 进行图像中的文字区域的识别
+        print("angel over! [{}]".format(time.time() - t))
+        t = time.time()
+
+    # 进行图像中的文字区域的识别：CTPN
     text_recs, tmp, img=text_detect(img)
+    print("ctpn over! [{}]".format(time.time() - t))
+
     # 识别区域排列
     text_recs = sort_box(text_recs)
-    # 
+
+    #
+    t = time.time()
     result = crnnRec(img, text_recs, model, adjust=adjust)
+    print("crnn over! [{}]".format(time.time() - t))
+
     return result, tmp, angle
 
 
