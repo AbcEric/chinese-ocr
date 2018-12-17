@@ -38,14 +38,23 @@ def dumpRotateImage_(img, degree, pt1, pt2, pt3, pt4):
 def crnnSource():
     alphabet = keys_crnn.alphabet
     converter = util.strLabelConverter(alphabet)
+
     if torch.cuda.is_available() and GPU:
+        print("GPU")
         model = crnn.CRNN(32, 1, len(alphabet) + 1, 256, 1).cuda()
     else:
+        print("CPU")
         model = crnn.CRNN(32, 1, len(alphabet) + 1, 256, 1).cpu()
+
     print(os.getcwd())
-    path = '/MyProjects/ModelSet/Chinese-OCR/crnn/samples/model_acc97.pth'         # PyTorch?
+    path = '../ModelSet/Chinese-OCR/crnn/samples/model_acc97.pth'                           # 模型识别种类：5530
+    # path = '../ModelSet/Chinese-OCR/crnn/samples/mixed_second_finetune_acc97p7.pth'         # 对比效果：6736，需要同步修改keys_crnn.py
+
     model.eval()
-    model.load_state_dict(torch.load(path))
+
+    # 带参数：不使用GPU
+    model.load_state_dict(torch.load(path, map_location='cpu'))
+
     return model, converter
 
 

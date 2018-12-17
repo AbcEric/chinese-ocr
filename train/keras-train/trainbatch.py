@@ -19,13 +19,17 @@ nclass = len(characters) + 1
 trainroot = '../data/lmdb/train'
 valroot = '../data/lmdb/val'
 # modelPath = '../pretrain-models/keras.hdf5'
-modelPath = '/Users/xiaofeng/Code/Github/dataset/CHINESE_OCR/save_model/my_model_keras.h5'
-workers = 4
+
+print(os.getcwd())
+modelPath = '../../../ModelSet/Chinese-OCR/my_model_keras.h5'
+workers = 2
+# workers = 4
 imgH = 32
 imgW = 256
 keep_ratio = False
 random_sample = False
-batchSize = 32
+batchSize = 1
+# batchSize = 32
 testSize = 16
 n_len = 50
 loss = 1000
@@ -34,7 +38,7 @@ LEARNING_RATE = 0.01
 Learning_decay_step = 20000
 PERCEPTION = 0.3
 EPOCH_NUMS = 1000000
-MODEL_PATH = '/Users/xiaofeng/Code/Github/dataset/CHINESE_OCR/save_model/'
+MODEL_PATH = '../../../ModelSet/Chinese-OCR/save_model/'
 LOG_FILE = 'log.txt'
 SUMMARY_PATH = './log/'
 if not os.path.exists(MODEL_PATH):
@@ -71,12 +75,13 @@ def one_hot(text, length=10, characters=characters):
 
 
 # 导入数据
+train_dataset = dataset.lmdbDataset(root=trainroot, target_transform=one_hot)
+print("train_len=", len(train_dataset))
+
 if random_sample:
     sampler = dataset.randomSequentialSampler(train_dataset, batchSize)
 else:
     sampler = None
-train_dataset = dataset.lmdbDataset(root=trainroot, target_transform=one_hot)
-# print(len(train_dataset))
 
 test_dataset = dataset.lmdbDataset(
     root=valroot,
@@ -90,8 +95,9 @@ train_loader = torch.utils.data.DataLoader(
     shuffle=True,
     sampler=sampler,
     num_workers=int(workers),
-    collate_fn=dataset.alignCollate(
-        imgH=imgH, imgW=imgW, keep_ratio=keep_ratio))
+    collate_fn=dataset.alignCollate(imgH=imgH, imgW=imgW, keep_ratio=keep_ratio))
+
+print("trainloader_len=", len(train_loader))
 
 test_loader = torch.utils.data.DataLoader(
     test_dataset, batch_size=testSize, shuffle=True, num_workers=int(workers))
@@ -99,18 +105,20 @@ test_loader = torch.utils.data.DataLoader(
 j = 0
 print('Strat training!!')
 for i in range(EPOCH_NUMS):
+    print(type(train_loader))
+    print("len=", len(train_loader))
     for X, Y in train_loader:
+        print("X,Y=", X, Y)
         start = time.time()
         X = X.numpy()
         X = X.reshape((-1, imgH, imgW, 1))
         Y = np.array(Y)
         Length = int(imgW / 4) - 2
         batch = X.shape[0]
-        X_train, Y_train = [
-            X, Y, np.ones(batch) * Length,
-            np.ones(batch) * n_len
-        ], np.ones(batch)
+        X_train, Y_train = [X, Y, np.ones(batch)*Length, np.ones(batch)*n_len], np.ones(batch)
         model.train_on_batch(X_train, Y_train)
+
+        print("11111")
         if j % interval == 0:
             times = time.time() - start
             currentLoss_train = model.evaluate(X_train, Y_train)
@@ -144,6 +152,7 @@ for i in range(EPOCH_NUMS):
             model.save(path)
             if crrentLoss < loss:
                 loss = crrentLoss
+
         if j > 0 and j % Learning_decay_step == 0:
             LEARNING_RATE_ori = LEARNING_RATE
             LEARNING_RATE = 0.5 * LEARNING_RATE

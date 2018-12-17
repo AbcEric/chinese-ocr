@@ -36,7 +36,7 @@ def load_tf_model():
     sess = tf.Session()
     ckpt = tf.train.get_checkpoint_state(
         # './checkpoints/')
-        '/MyProjects/ModelSet/Chinese-OCR/ctpn/checkpoints/')
+        '../ModelSet/Chinese-OCR/ctpn/checkpoints/')
     # print("load ckpt=[", ckpt, "]")
 
     reader = tf.train.NewCheckpointReader(ckpt.model_checkpoint_path)

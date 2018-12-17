@@ -16,7 +16,7 @@ paths = glob('./test/*.*')
 
 if __name__ == '__main__':
     print("Demo ...")
-    im = Image.open("./test/test.png")
+    im = Image.open("./test/003.jpg")
     img = np.array(im.convert('RGB'))
     t = time.time()
 
